@@ -36,6 +36,7 @@ func (f Filter) filter(node *yaml.RNode) (*yaml.RNode, error) {
 	// FsSlice is an allowlist, not a denyList, so to deny
 	// something via configuration a new config mechanism is
 	// needed. Until then, hardcode it.
+  println("filter imagetag invoked")
 	if f.isOnDenyList(node) {
 		return node, nil
 	}

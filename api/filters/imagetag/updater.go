@@ -25,6 +25,7 @@ func (u imageTagUpdater) Filter(rn *yaml.RNode) (*yaml.RNode, error) {
 	}
 
 	value := rn.YNode().Value
+  println("imageTagUpdater found image", value)
 
 	if !image.IsImageMatched(value, u.ImageTag.Name) {
 		return rn, nil
@@ -33,6 +34,7 @@ func (u imageTagUpdater) Filter(rn *yaml.RNode) (*yaml.RNode, error) {
 	name, tag := image.Split(value)
 	if u.ImageTag.NewName != "" {
 		name = image.NewImageName(u.ImageTag.Name, name, u.ImageTag.NewName)
+    println("imageTagUpdater changed imagename")
 	}
 	if u.ImageTag.NewTag != "" {
 		tag = ":" + u.ImageTag.NewTag
@@ -40,6 +42,7 @@ func (u imageTagUpdater) Filter(rn *yaml.RNode) (*yaml.RNode, error) {
 	if u.ImageTag.Digest != "" {
 		tag = "@" + u.ImageTag.Digest
 	}
+  println("Return from imageTagUpdater implementation", name, tag)
 
 	return rn.Pipe(yaml.FieldSetter{StringValue: name + tag})
 }
