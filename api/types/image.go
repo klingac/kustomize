@@ -18,4 +18,8 @@ type Image struct {
 	// Digest is the value used to replace the original image tag.
 	// If digest is present NewTag value is ignored.
 	Digest string `json:"digest,omitempty" yaml:"digest,omitempty"`
+
+	// Digest is the value used to replace the original image tag.
+	// If digest is present NewTag value is ignored.
+	Regexp string `json:"regexp,omitempty" yaml:"regexp,omitempty"`
 }

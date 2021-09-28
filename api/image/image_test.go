@@ -68,6 +68,24 @@ func TestSplit(t *testing.T) {
 			name:     "nginx",
 			tag:      "@12345",
 		},
+		// {
+		// 	testName: "no tag with repository",
+		// 	value:    "my-repository/nginx@12345",
+		// 	name:     "nginx",
+		// 	tag:      "@12345",
+		// },
+		// {
+		// 	testName: "with tag with repository",
+		// 	value:    "my-repository/nginx@1.2.3",
+		// 	name:     "nginx",
+		// 	tag:      ":12345",
+		// },
+		// {
+		// 	testName: "with digest wit repository",
+		// 	value:    "my-repository/nginx@12345",
+		// 	name:     "nginx",
+		// 	tag:      "@12345",
+		// },
 	}
 
 	for _, tc := range testCases {
@@ -75,6 +93,59 @@ func TestSplit(t *testing.T) {
 			name, tag := Split(tc.value)
 			assert.Equal(t, tc.name, name)
 			assert.Equal(t, tc.tag, tag)
+		})
+	}
+}
+
+func TestNewImageName(t *testing.T) {
+	testCases := []struct {
+		testName       string
+		origName       string
+		searchPattern  string
+		newNamePattern string
+		resultNewName  string
+	}{
+		{
+			testName:       "simple replace",
+			origName:       "adoptopenjdk",
+			searchPattern:  "open",
+			newNamePattern: "closed",
+			resultNewName:  "adoptclosedjdk",
+		},
+		{
+			testName:       "simple regex",
+			origName:       "adoptopenjdk",
+			searchPattern:  "^adopt",
+			newNamePattern: "my",
+			resultNewName:  "myopenjdk",
+		},
+		{
+			testName:       "no match",
+			origName:       "nginx",
+			searchPattern:  "adoptopenjdk",
+			newNamePattern: "my",
+			resultNewName:  "nginx",
+		},
+		{
+			testName:       "simple regex with capture groups",
+			origName:       "nginx",
+			searchPattern:  "(.*)",
+			newNamePattern: "my-registry/$1",
+			resultNewName:  "my-registry/nginx",
+		},
+		{
+			testName:       "complex regex with capture groups",
+			origName:       "nginx",
+			searchPattern:  "([^/]*/)?(.*)",
+			newNamePattern: "my-registry/$2",
+			resultNewName:  "my-registry/nginx",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testName, func(t *testing.T) {
+			name := NewImageName(tc.searchPattern, tc.origName, tc.newNamePattern)
+			assert.Equal(t, tc.resultNewName, name)
 		})
 	}
 }

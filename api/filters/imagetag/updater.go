@@ -18,14 +18,14 @@ type imageTagUpdater struct {
 }
 
 func (u imageTagUpdater) Filter(rn *yaml.RNode) (*yaml.RNode, error) {
-  //FIXME for some reason, the fuction is invoked twice for each image
-  //      with the value in yamlRNode already modified
+	//FIXME for some reason, the fuction is invoked twice for each image
+	//      with the value in yamlRNode already modified
 	if err := yaml.ErrorIfInvalid(rn, yaml.ScalarNode); err != nil {
 		return nil, err
 	}
 
 	value := rn.YNode().Value
-  println("imageTagUpdater found image", value)
+	println("imageTagUpdater found image", value)
 
 	if !image.IsImageMatched(value, u.ImageTag.Name) {
 		return rn, nil
@@ -33,8 +33,12 @@ func (u imageTagUpdater) Filter(rn *yaml.RNode) (*yaml.RNode, error) {
 
 	name, tag := image.Split(value)
 	if u.ImageTag.NewName != "" {
-		name = image.NewImageName(u.ImageTag.Name, name, u.ImageTag.NewName)
-    println("imageTagUpdater changed imagename")
+		if u.ImageTag.Regexp != "" {
+			name = image.NewImageName(u.ImageTag.Regexp, name, u.ImageTag.NewName)
+		} else {
+			name = u.ImageTag.NewName
+		}
+		println("imageTagUpdater changed imagename")
 	}
 	if u.ImageTag.NewTag != "" {
 		tag = ":" + u.ImageTag.NewTag
@@ -42,7 +46,7 @@ func (u imageTagUpdater) Filter(rn *yaml.RNode) (*yaml.RNode, error) {
 	if u.ImageTag.Digest != "" {
 		tag = "@" + u.ImageTag.Digest
 	}
-  println("Return from imageTagUpdater implementation", name, tag)
+	println("Return from imageTagUpdater implementation", name, tag)
 
 	return rn.Pipe(yaml.FieldSetter{StringValue: name + tag})
 }

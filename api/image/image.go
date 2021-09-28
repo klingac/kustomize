@@ -21,9 +21,10 @@ func IsImageMatched(s, t string) bool {
 // NewImageName creates new image name with name used as pattern for
 // replacement of original image name and newName as a replacement
 // that accepts subMatch (capture groups)
-func NewImageName(pattern, name, newName string) string {
-  re, _ := regexp.Compile("^"+ pattern +".*$")
-  return re.ReplaceAllString(name, newName)
+func NewImageName(searchPattern, origName, newNamePattern string) string {
+	// re, _ := regexp.Compile("^" + searchPattern + ".*$")
+	re, _ := regexp.Compile(searchPattern)
+	return re.ReplaceAllString(origName, newNamePattern)
 }
 
 // Split separates and returns the name and tag parts
